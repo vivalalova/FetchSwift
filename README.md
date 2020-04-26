@@ -25,10 +25,10 @@ final class SomewhereAPI: Fetch {
 }
 
 extension SomewhereAPI {
-		struct Post: Codeable {
-			var title:String?
-			var content:String?
-		}
+    struct Post: Codeable {
+        var title:String?
+        var content:String?
+    }
 
     func fetch() -> Response<[Posts]> {
         self.call(path: "posts")
