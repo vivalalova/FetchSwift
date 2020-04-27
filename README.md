@@ -1,6 +1,8 @@
 # FetchSwift
 
 
+### Usage
+
 ```swift
 final class SomewhereAPI: Fetch {
     var domain: String = "https://www.somewhere.com/"
