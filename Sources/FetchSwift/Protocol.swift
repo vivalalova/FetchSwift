@@ -25,8 +25,10 @@ protocol Fetch: AnyObject {
     var decoder: JSONDecoder { get }
     var encoder: JSONEncoder { get }
 
-    func willSend(params: [String: Any], method: Method, path: String, parameters: [String: Any]) -> Params
-    func willSend(request: URLRequest, method: Method, path: String, parameters: [String: Any]) -> URLRequest
+    static var shared: Self { get }
+
+    func willSend(params: [String: Any], method: Method, path: String) -> Params
+    func willSend(request: URLRequest, method: Method, path: String, params: [String: Any]) -> URLRequest
 
     func show(progress: Float?)
     func hide(progress: Float?)

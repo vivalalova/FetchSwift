@@ -13,12 +13,14 @@ public
 extension Fetch {
     typealias Response<T> = Publishers.ReceiveOn<AnyPublisher<T, Never>, DispatchQueue>
 
-    private func call(method: Method = .get, path: String, parameters: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Publishers.Map<URLSession.DataTaskPublisher, Data> {
-        var params = parameters
+    private func call(method: Method = .get, path: String, params: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Publishers.Map<URLSession.DataTaskPublisher, Data> {
+        var params = params
 
-        params = self.willSend(params: params, method: method, path: path, parameters: parameters)
+        params = self.willSend(params: params, method: method, path: path)
 
-        let url = URL(string: domain + path)!
+        guard let url = URL(string: domain + path) else {
+            fatalError("not a url")
+        }
 
         var request = URLRequest(url: url)
         request.httpMethod = method.rawValue
@@ -32,25 +34,24 @@ extension Fetch {
             request.httpBody = bodyString.data(using: .utf8)
         }
 
-        request = self.willSend(request: request, method: method, path: path, parameters: parameters)
+        request = self.willSend(request: request, method: method, path: path, params: params)
 
         if showHUD {
             self.show(progress: nil)
         }
 
-        return URLSession.shared.dataTaskPublisher(for: request)
-            .map { response -> Data in
+        return URLSession.shared.dataTaskPublisher(for: request).map { response -> Data in
 
-                if showHUD {
-                    self.hide(progress: nil)
-                }
-
-                let data = response.data
-                return data
+            if showHUD {
+                self.hide(progress: nil)
             }
+
+            let data = response.data
+            return data
+        }
     }
 
-//    func call(method: Method = .get, path: String, parameters: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Publishers.ReceiveOn<AnyPublisher<String?, Never>, DispatchQueue> {
+//    func fetch(method: Method = .get, path: String, parameters: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Publishers.ReceiveOn<AnyPublisher<String?, Never>, DispatchQueue> {
 //        self.call(method: method, path: path, parameters: parameters, showHUD: showHUD, showErrorMessage: showErrorMessage)
 //            .map { String(data: $0, encoding: .utf8) }
 //            .replaceError(with: nil)
@@ -58,24 +59,24 @@ extension Fetch {
 //            .receive(on: DispatchQueue.main)
 //    }
 
-    func call(method: Method = .get, path: String, parameters: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Response<Any?> {
-        self.call(method: method, path: path, parameters: parameters, showHUD: showHUD, showErrorMessage: showErrorMessage)
+    func fetch(method: Method = .get, path: String, params: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Response<Any?> {
+        self.call(method: method, path: path, params: params, showHUD: showHUD, showErrorMessage: showErrorMessage)
             .map { try? JSONSerialization.jsonObject(with: $0, options: .allowFragments) }
             .replaceError(with: nil)
             .eraseToAnyPublisher()
             .receive(on: DispatchQueue.main)
     }
 
-    func call<T: Codable>(method: Method = .get, path: String, parameters: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Response<[T]> {
-        self.call(method: method, path: path, parameters: parameters, showHUD: showHUD, showErrorMessage: showErrorMessage)
+    func fetch<T: Codable>(method: Method = .get, path: String, params: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Response<[T]> {
+        self.call(method: method, path: path, params: params, showHUD: showHUD, showErrorMessage: showErrorMessage)
             .decode(type: [T].self, decoder: self.decoder)
             .replaceError(with: [])
             .eraseToAnyPublisher()
             .receive(on: DispatchQueue.main)
     }
 
-    func call<T: Codable>(method: Method = .get, path: String, parameters: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Response<T?> {
-        self.call(method: method, path: path, parameters: parameters, showHUD: showHUD, showErrorMessage: showErrorMessage)
+    func fetch<T: Codable>(method: Method = .get, path: String, params: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Response<T?> {
+        self.call(method: method, path: path, params: params, showHUD: showHUD, showErrorMessage: showErrorMessage)
             .decode(type: T?.self, decoder: self.decoder)
             .replaceError(with: nil)
             .eraseToAnyPublisher()

@@ -10,6 +10,7 @@ import Combine
 import Foundation
 
 extension URL {
+    /// for GET method
     func addParameter(_ dict: [String: Any]) -> URL {
         let string = "\(self.absoluteString)?\(dict.queryParameters)"
 
