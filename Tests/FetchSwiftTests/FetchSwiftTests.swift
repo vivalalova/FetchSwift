@@ -6,11 +6,6 @@ final class FetchSwiftTests: XCTestCase {
     var task: AnyCancellable?
 
     func testExample() {
-        // This is an example of a functional test case.
-        // Use XCTAssert and related functions to verify your tests produce the correct
-        // results.
-//        XCTAssertEqual(FetchSwift().text, "Hello, World!")
-
         let expectation = XCTestExpectation(description: name)
 
         self.task = ExampleAPI.shared.test().sink { results in
@@ -18,6 +13,7 @@ final class FetchSwiftTests: XCTestCase {
             XCTAssertEqual(results.first?.id, 1)
             XCTAssertEqual(results.first?.userId, 1)
             XCTAssertEqual(results.first?.title, "delectus aut autem")
+            XCTAssertEqual(results.first?.completed, false)
 
             expectation.fulfill()
         }

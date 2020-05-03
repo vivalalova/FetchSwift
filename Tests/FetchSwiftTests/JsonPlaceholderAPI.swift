@@ -17,6 +17,7 @@ struct Todo: Codable {
 }
 
 final class ExampleAPI: Fetch {
+    /// ref: https://jsonplaceholder.typicode.com/
     var domain: String = "https://jsonplaceholder.typicode.com/"
 
     var decoder = JSONDecoder()
