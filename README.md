@@ -4,21 +4,22 @@
 ### Usage
 
 ```swift
-final class SomewhereAPI: Fetch {
-    var domain: String = "https://www.somewhere.com/"
+final class JsonPlaceholderAPI: Fetch {
+    /// ref: https://jsonplaceholder.typicode.com/
+    var domain: String = "https://jsonplaceholder.typicode.com/"
 
-    var decoder: JSONDecoder = JSONDecoder()
+    var decoder = JSONDecoder()
 
-    var encoder: JSONEncoder = JSONEncoder()
+    var encoder = JSONEncoder()
 
-    static let shared = SomewhereAPI()
+    static var shared: JsonPlaceholderAPI = JsonPlaceholderAPI()
 
-    func willSend(params: [String: Any], method: FetchSwift.Method, path: String, parameters: [String: Any]) -> Params {
-        return params
+    func willSend(params: [String: Any], method: FetchSwift.Method, path: String) -> Params {
+        params
     }
 
-    func willSend(request: URLRequest, method: FetchSwift.Method, path: String, parameters: [String: Any]) -> URLRequest {
-        return request
+    func willSend(request: URLRequest, method: FetchSwift.Method, path: String, params: [String: Any]) -> URLRequest {
+        request
     }
 
     func show(progress: Float?) {}
@@ -26,14 +27,16 @@ final class SomewhereAPI: Fetch {
     func hide(progress: Float?) {}
 }
 
-extension SomewhereAPI {
-    struct Post: Codeable {
-        var title:String?
-        var content:String?
+extension JsonPlaceholderAPI {
+    struct Todo: Codable {
+        var id: Int?
+        var userId: Int?
+        var title: String?
+        var completed: Bool?
     }
 
-    func fetch() -> Response<[Post]> {
-        self.call(path: "posts")
+    func todos() -> Response<[Todo]> {
+        self.fetch(path: "todos")
     }
 }
 ```

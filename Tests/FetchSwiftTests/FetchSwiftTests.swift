@@ -8,7 +8,7 @@ final class FetchSwiftTests: XCTestCase {
     func testExample() {
         let expectation = XCTestExpectation(description: name)
 
-        self.task = ExampleAPI.shared.test().sink { results in
+        self.task = JsonPlaceholderAPI.shared.todos().sink { results in
 
             XCTAssertEqual(results.first?.id, 1)
             XCTAssertEqual(results.first?.userId, 1)

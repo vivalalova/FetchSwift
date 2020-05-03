@@ -9,14 +9,7 @@ import Combine
 @testable import FetchSwift
 import Foundation
 
-struct Todo: Codable {
-    var id: Int?
-    var userId: Int?
-    var title: String?
-    var completed: Bool?
-}
-
-final class ExampleAPI: Fetch {
+final class JsonPlaceholderAPI: Fetch {
     /// ref: https://jsonplaceholder.typicode.com/
     var domain: String = "https://jsonplaceholder.typicode.com/"
 
@@ -24,7 +17,7 @@ final class ExampleAPI: Fetch {
 
     var encoder = JSONEncoder()
 
-    static var shared: ExampleAPI = ExampleAPI()
+    static var shared: JsonPlaceholderAPI = JsonPlaceholderAPI()
 
     func willSend(params: [String: Any], method: FetchSwift.Method, path: String) -> Params {
         params
@@ -37,8 +30,17 @@ final class ExampleAPI: Fetch {
     func show(progress: Float?) {}
 
     func hide(progress: Float?) {}
+}
 
-    func test() -> Response<[Todo]> {
+extension JsonPlaceholderAPI {
+    struct Todo: Codable {
+        var id: Int?
+        var userId: Int?
+        var title: String?
+        var completed: Bool?
+    }
+
+    func todos() -> Response<[Todo]> {
         self.fetch(path: "todos")
     }
 }
