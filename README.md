@@ -32,7 +32,7 @@ extension SomewhereAPI {
         var content:String?
     }
 
-    func fetch() -> Response<[Posts]> {
+    func fetch() -> Response<[Post]> {
         self.call(path: "posts")
     }
 }
