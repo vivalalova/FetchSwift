@@ -14,9 +14,9 @@ extension Fetch {
     typealias Response<T> = Publishers.ReceiveOn<AnyPublisher<T, Never>, DispatchQueue>
 
     private func call(method: Method = .get, path: String, params: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Publishers.Map<URLSession.DataTaskPublisher, Data> {
-        var params = params
+        var parameters = params
 
-        params = self.willSend(params: params, method: method, path: path)
+        parameters = self.willSend(params: parameters, method: method, path: path)
 
         guard let url = URL(string: domain + path) else {
             fatalError("not a url")
@@ -27,14 +27,18 @@ extension Fetch {
 
         switch method {
         case .get:
-            request.url = url.addParameter(params)
+            request.url = url.addParameter(parameters)
         case .post, .put, .delete:
-            request.addValue("Content-Type: application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
-            let bodyString = params.queryParameters
-            request.httpBody = bodyString.data(using: .utf8)
+            request.addValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
+
+            guard let data = try? JSONSerialization.data(withJSONObject: params) else {
+                fatalError("data failed")
+            }
+
+            request.httpBody = data
         }
 
-        request = self.willSend(request: request, method: method, path: path, params: params)
+        request = self.willSend(request: request, method: method, path: path, params: parameters)
 
         if showHUD {
             self.show(progress: nil)
