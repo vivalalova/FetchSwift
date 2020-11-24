@@ -12,8 +12,9 @@ import Foundation
 public
 extension Fetch {
     typealias Response<T> = Publishers.ReceiveOn<AnyPublisher<T, Never>, DispatchQueue>
+    typealias PreResponse = Publishers.Map<URLSession.DataTaskPublisher, Data>
 
-    private func call(method: Method = .get, path: String, params: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> Publishers.Map<URLSession.DataTaskPublisher, Data> {
+    private func call(method: Method = .get, path: String, params: [String: Any] = [:], showHUD: Bool = false, showErrorMessage: Bool = true) -> PreResponse {
         var parameters = params
 
         parameters = self.willSend(params: parameters, method: method, path: path)
@@ -38,7 +39,7 @@ extension Fetch {
             request.httpBody = data
         }
 
-        request = self.willSend(request: request, method: method, path: path, params: parameters)
+        request = self.willSend(request: &request, method: method, path: path, params: parameters)
 
         if showHUD {
             self.show(progress: nil)
